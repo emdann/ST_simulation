@@ -2,13 +2,13 @@
 
 <!-- Note: This folder provides a collection of scripts we used to simulated data but the scripts need to be edited to be used on other platforms (contains hard-coded paths for our HPC). -->
 This repo provides a collection of scripts used to generate simulated spatial transcriptomics data as a mixture of single-cell transcriptomics profiles (adapting code and model from [Andersson et al. 2019](https://www.biorxiv.org/content/10.1101/2019.12.13.874495v1)). Parameters are chosen to simulate the characteristics of 10X Genomics Visium chips.
-
+<!-- 
 #### Contents
 
 - `ST_simulation.py` functions to simulate spots
 - `split_sc.py` script to split mouse brain snRNA-seq reference into generation dataset (single cells used to make the synthetic spots) and validation dataset (single cells used as a reference to train the location model)
 - `assemble_ST.py` script to generate synthetic ST spots from the generation dataset
-
+ -->
 ### Run simulation 
 
 Initial input: 
@@ -30,7 +30,7 @@ Output: generation and validation count matrices and cell type annotations are s
 n_spots=100
 seed=$(ls labels_generation* | sed 's/.*_//' | sed 's/.p//')
 python ST_simulation/assemble_design.py \
-    ${seed} \
+    $seed \
   --tot_spots $n_spots --mean_high 3 --mean_low 1 \
   --out_dir <output_directory>
 ```
@@ -48,7 +48,7 @@ Output: `synthetic_ST_seed${seed}_${assemble_id}_design.csv` contains the design
 ```
 id=1
 python cell2location/pycell2location/ST_simulation/assemble_composition.py \
-    ${seed} \
+    $seed \
     --tot_spots $n_spots --assemble_id $id
 ```
 
