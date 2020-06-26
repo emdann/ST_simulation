@@ -38,17 +38,17 @@ def assemble_ct_composition(design_df, tot_spots, ncells_scale=5):
 
 
 def assemble_spot_2(cnt, labels, members):
-    '''
-    Parameters
-    ----------
-    design_df: pd.DataFrame containing number of spots (nspots) and mean n of 
-        cells per spot (mean_ncell) per cell type
-    tot_spots: int
-        total number of spots to simulate
-    Return
-    ------
-    pd.DataFrame of cell types x spots with no of cells 
-    '''
+#     uni_labels = members.index
+#     spot_expr = t.zeros(cnt.shape[1]).type(t.float32)
+#     for z in range(len(uni_labels)):
+#         if members[z] > 0:
+#             idx = np.where(labels == uni_labels[z])[0]
+#             # pick random cells from type
+#             np.random.shuffle(idx)
+#             idx = idx[0:int(members[z])]
+#             # add fraction of transcripts to spot expression
+#             z_expr = t.tensor((cnt.iloc[idx, :] * fraction).sum(axis=0).round().astype(np.float32))
+#             spot_expr += z_expr
     uni_labels = members.index
     spot_expr = t.zeros(cnt.shape[1]).type(t.float32)
     nUMIs = t.zeros((len(uni_labels))).type(t.float32)
