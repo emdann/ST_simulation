@@ -25,7 +25,7 @@ python cell2location/pycell2location/ST_simulation/split_sc.py <counts_h5ad> <an
 ```
 n_spots=100
 seed=$(ls labels_generation* | sed 's/.*_//' | sed 's/.p//')
-python ST_simulation/assemble_design_2.py \
+python ST_simulation/assemble_design.py \
     ${seed} \
   --tot_spots $n_spots --mean_high 5 --mean_low 2 \
   --out_dir <output_directory>
@@ -34,14 +34,14 @@ python ST_simulation/assemble_design_2.py \
 3. Assemble cell type composition per spot
 ```
 id=1
-python cell2location/pycell2location/ST_simulation/assemble_composition_2.py \
+python cell2location/pycell2location/ST_simulation/assemble_composition.py \
     ${seed} \
     --tot_spots $n_spots --assemble_id $id
 ```
 
 4. Assemble simulated ST spots
 ```
-python ${c2l_dir}/pycell2location/ST_simulation/assemble_st_2.py \
+python ${c2l_dir}/pycell2location/ST_simulation/assemble_st.py \
     ${seed} --assemble_id $id
 ```
 
@@ -51,6 +51,7 @@ Final output:
 - `synthetic_ST_seed${seed}_${assemble_id}_composition.csv` contains the number of cells per cell type in each spot, for benchmarking deconvolution models
 - `synthetic_ST_seed${seed}_${assemble_id}_umis.csv` contains the number of UMIs per cell type in each spot, for benchmarking deconvolution methods that model number of UMIs
 - `synthetic_ST_seed${seed}_${assemble_id}_design.csv` contains the design used for the simulation:
+
 | **Column**  | **Data**                                                                                         |
 |-------------|--------------------------------------------------------------------------------------------------|
 | uniform     | is the cell type uniformly located across spots (1) or localized in a small subset of spots (0)  |
