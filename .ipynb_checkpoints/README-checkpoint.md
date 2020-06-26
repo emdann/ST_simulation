@@ -1,4 +1,4 @@
-### Simulation of Visium spots from single-cell reference
+## Simulation of Spatial Transcriptomics spots from single-cell reference
 
 <!-- Note: This folder provides a collection of scripts we used to simulated data but the scripts need to be edited to be used on other platforms (contains hard-coded paths for our HPC). -->
 This repo provides a collection of scripts used to generate simulated spatial transcriptomics data as a mixture of single-cell transcriptomics profiles (adapting code and model from [Andersson et al. 2019](https://www.biorxiv.org/content/10.1101/2019.12.13.874495v1)). Parameters are chosen to simulate the characteristics of 10X Genomics Visium chips.
@@ -11,47 +11,31 @@ This repo provides a collection of scripts used to generate simulated spatial tr
 
 ### Run simulation 
 
-Required input: 
+Initial input: 
 
 - AnnData object of raw counts per single-cells (saved as `h5ad` file)
 - A table of cell type annotations per cell that we want to deconvolve (saved as `csv` file)
 
-**(Step 1) Split single-cell dataset:** we split the cells in the single-cell dataset in a 'generation set', that will be used to simulate the ST spots, and a 'validation' set, that will be used to train the deconvolution models that we want to benchmark.
+**(Step 1) Split single-cell dataset:** we split the cells in the single-cell dataset in a 'generation set', that will be used to simulate the ST spots, and a 'validation' set, that will be used to train the deconvolution models that we want to benchmark. From the command line:
 
 ```
-python cell2location/pycell2location/ST_simulation/split_sc.py <counts_h5ad> <annotation_csv> --annotation_col annotation_1  --out_dir <output_directory>
+python split_sc.py <counts_h5ad> <annotation_csv> --annotation_col annotation_1  --out_dir <output_directory>
 ```
 
-2. Build design matrix: this step defines which cell types are (A) low/high density and (B) Uniformly present in all the spots or localized in few spots (regional)
+Output: generation and validation count matrices and cell type annotations are saved as `pickle` files, with a random seed identifying the split. 
+
+**(Step 2) Build design matrix**: in this step we define which cell types are (A) low/high density and (B) Uniformly present in all the spots or localized in few spots (regional). To generate synthetic spots with ~10 cells per spot (as seen with nuclear segmentation on Visium spots) we reccommend setting the mean number of cells per spot per cell type < 5.
+
 ```
 n_spots=100
 seed=$(ls labels_generation* | sed 's/.*_//' | sed 's/.p//')
 python ST_simulation/assemble_design.py \
     ${seed} \
-  --tot_spots $n_spots --mean_high 5 --mean_low 2 \
+  --tot_spots $n_spots --mean_high 3 --mean_low 1 \
   --out_dir <output_directory>
 ```
 
-3. Assemble cell type composition per spot
-```
-id=1
-python cell2location/pycell2location/ST_simulation/assemble_composition.py \
-    ${seed} \
-    --tot_spots $n_spots --assemble_id $id
-```
-
-4. Assemble simulated ST spots
-```
-python ${c2l_dir}/pycell2location/ST_simulation/assemble_st.py \
-    ${seed} --assemble_id $id
-```
-
-Final output:
-
-- `synthetic_ST_seed${seed}_${assemble_id}_counts.csv` contains the count matrix for the simulated ST spots
-- `synthetic_ST_seed${seed}_${assemble_id}_composition.csv` contains the number of cells per cell type in each spot, for benchmarking deconvolution models
-- `synthetic_ST_seed${seed}_${assemble_id}_umis.csv` contains the number of UMIs per cell type in each spot, for benchmarking deconvolution methods that model number of UMIs
-- `synthetic_ST_seed${seed}_${assemble_id}_design.csv` contains the design used for the simulation:
+Output: `synthetic_ST_seed${seed}_${assemble_id}_design.csv` contains the design used for the simulation:
 
 | **Column**  | **Data**                                                                                         |
 |-------------|--------------------------------------------------------------------------------------------------|
@@ -60,6 +44,25 @@ Final output:
 | nspots      | total number of spots in which the cell type is located                                          |
 | mean_ncells | mean number of cells per spot                                                                    |
 
+**(Step 3) Assemble cell type composition per spot:** based on the design matrix, we define how many cell types per  An assemble ID is used to identify 
+```
+id=1
+python cell2location/pycell2location/ST_simulation/assemble_composition.py \
+    ${seed} \
+    --tot_spots $n_spots --assemble_id $id
+```
+
+Output: `synthetic_ST_seed${seed}_${assemble_id}_composition.csv` contains the number of cells per cell type in each spot, for benchmarking deconvolution models
+
+**(Step 4) Assemble simulated ST spots**
+```
+python assemble_st.py ${seed} --assemble_id $id
+```
+
+Output:
+
+- `synthetic_ST_seed${seed}_${assemble_id}_counts.csv` contains the count matrix for the simulated ST spots
+- `synthetic_ST_seed${seed}_${assemble_id}_umis.csv` contains the number of UMIs per cell type in each spot, for benchmarking deconvolution methods that model number of UMIs
 
 
 ### Speeding up the simulation process

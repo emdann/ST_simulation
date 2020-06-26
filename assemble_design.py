@@ -20,6 +20,9 @@ parser.add_argument('--mean_high', dest='mean_high', type=int,
 parser.add_argument('--mean_low', dest='mean_low', type=int,
                     default=5,
                     help='Mean cell density for low-density cell types')
+parser.add_argument('--annotation_col', dest='anno_col', type=str,
+                    default="annotation_1",
+                    help='Name of column to use in annotation file (default: annotation_1)')
 parser.add_argument('--out_dir', dest='out_dir', type=str,
                     default='/nfs/team283/ed6/simulation/lowdens_synthetic_ST_fewcells/',
                     help='Output directory')
@@ -37,6 +40,7 @@ mean_high = args.mean_high
 mean_low = args.mean_low
 out_dir = args.out_dir
 assemble_id = args.assemble_id
+anno_col = args.anno_col
 
 ### Load input data ### 
 lbl_gen_file = out_dir + "labels_generation_" + str(seed) + ".p"
@@ -45,7 +49,7 @@ count_gen_file = out_dir + "counts_generation_" + str(seed) + ".p"
 lbl_generation = pickle.load(open(lbl_gen_file, "rb"))
 cnt_generation = pickle.load(open(count_gen_file, "rb"))
 
-uni_labels = lbl_generation['annotation_1'].unique()
+uni_labels = lbl_generation[anno_col].unique()
 labels = lbl_generation
 cnt = cnt_generation
 

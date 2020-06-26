@@ -22,6 +22,9 @@ parser.add_argument('--out_dir', dest='out_dir', type=str,
 parser.add_argument('--assemble_id', dest='assemble_id', type=int,
                     default=1,
                     help='ID of ST assembly')
+parser.add_argument('--annotation_col', dest='anno_col', type=str,
+                    default="annotation_1",
+                    help='Name of column to use in annotation file (default: annotation_1)')
 
 args = parser.parse_args()
 
@@ -32,6 +35,7 @@ seed = args.seed
 tot_spots = args.tot_spots
 out_dir = args.out_dir
 assemble_id = args.assemble_id
+anno_col = args.anno_col
 
 ### Load input data ### 
 lbl_gen_file = out_dir + "labels_generation_" + str(seed) + ".p"
@@ -41,7 +45,7 @@ design_file = out_dir + "synthetic_ST_seed" + str(seed) + "_design.csv"
 lbl_generation = pickle.load(open(lbl_gen_file, "rb"))
 cnt_generation = pickle.load(open(count_gen_file, "rb"))
 
-uni_labels = lbl_generation['annotation_1'].unique()
+uni_labels = lbl_generation[anno_col].unique()
 labels = lbl_generation
 cnt = cnt_generation
 

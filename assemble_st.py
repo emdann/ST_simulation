@@ -4,12 +4,6 @@ import pickle
 from ST_simulation import *
 
 parser = argparse.ArgumentParser()
-# parser.add_argument('lbl_gen_file', type=str,
-#                     help='path to label generation pickle file')
-# parser.add_argument('cnt_gen_file', type=str,
-#                     help='path to label generation pickle file')
-# parser.add_argument('spots_comp', type=str,
-#                     help='path to composition csv file')
 parser.add_argument('seed', type=int,
                     help='random seed of split')
 parser.add_argument('--out_dir', dest='out_dir', type=str,
@@ -18,6 +12,9 @@ parser.add_argument('--out_dir', dest='out_dir', type=str,
 parser.add_argument('--assemble_id', dest='assemble_id', type=int,
                     default=1,
                     help='ID of ST assembly')
+parser.add_argument('--annotation_col', dest='anno_col', type=str,
+                    default="annotation_1",
+                    help='Name of column to use in annotation file (default: annotation_1)')
 
 args = parser.parse_args()
 
@@ -28,6 +25,7 @@ seed = args.seed
 out_dir = args.out_dir
 assemble_id = args.assemble_id
 # usecols = args.usecols
+anno_col = args.anno_col
 
 ### Load input data ### 
 lbl_gen_file = out_dir + "labels_generation_" + str(seed) + ".p"
@@ -39,7 +37,7 @@ cnt_generation = pickle.load(open(count_gen_file, "rb"))
 spots_members = pd.read_csv(spots_members_file, index_col=0)
 
 tot_spots = spots_members.shape[1]
-uni_labels = lbl_generation['annotation_1'].unique()
+uni_labels = lbl_generation[anno_col].unique()
 labels = lbl_generation
 cnt = cnt_generation
 
