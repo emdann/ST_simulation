@@ -73,10 +73,10 @@ mean_sparse = round((tot_spots / 100) * 5)
 sigma_unif = np.sqrt(mean_unif)
 sigma_sparse = np.sqrt(mean_sparse)
 
-shape_unif = mean_unif ^ 2 / sigma_unif ^ 2
-scale_unif = sigma_unif ^ 2 / mean_unif
-shape_sparse = mean_sparse ^ 2 / sigma_sparse ^ 2
-scale_sparse = sigma_sparse ^ 2 / mean_sparse
+shape_unif = mean_unif ** 2 / sigma_unif ** 2
+scale_unif = sigma_unif ** 2 / mean_unif
+shape_sparse = mean_sparse ** 2 / sigma_sparse ** 2
+scale_sparse = sigma_sparse ** 2 / mean_sparse
 
 unif_nspots = np.round(np.random.gamma(shape=shape_unif, scale=scale_unif, size=sum(design_df.uniform == 1)))
 sparse_nspots = np.round(np.random.gamma(shape=shape_sparse, scale=scale_sparse, size=sum(design_df.uniform == 0)))
@@ -89,10 +89,10 @@ design_df.loc[design_df.index[design_df.uniform == 0], 'nspots'] = sparse_nspots
 sigma_low = np.sqrt(mean_low / 2)
 sigma_high = np.sqrt(mean_high / 2)
 
-shape_low = mean_low ^ 2 / sigma_low ^ 2
-scale_low = sigma_low ^ 2 / mean_low
-shape_high = mean_high ^ 2 / sigma_high ^ 2
-scale_high = sigma_high ^ 2 / mean_high
+shape_low = mean_low ** 2 / sigma_low ** 2
+scale_low = sigma_low ** 2 / mean_low
+shape_high = mean_high ** 2 / sigma_high ** 2
+scale_high = sigma_high ** 2 / mean_high
 
 low_ncells_mean = np.random.gamma(shape=shape_low, scale=scale_low, size=sum(design_df.density == 1))
 high_ncells_mean = np.random.gamma(shape=shape_high, scale=scale_high, size=sum(design_df.density == 0))
