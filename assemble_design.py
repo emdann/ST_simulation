@@ -70,8 +70,8 @@ design_df.loc[design_df.index[design_df.uniform == 0], 'density'] = reg_low
 # Uniform ~ 60% of spots, sparse ~ 5% of spots
 mean_unif = round((tot_spots / 100) * 60)
 mean_sparse = round((tot_spots / 100) * 5)
-sigma_unif = mean_unif
-sigma_sparse = mean_sparse
+sigma_unif = np.sqrt(mean_unif)
+sigma_sparse = np.sqrt(mean_sparse)
 
 shape_unif = mean_unif ^ 2 / sigma_unif ^ 2
 scale_unif = sigma_unif ^ 2 / mean_unif
@@ -86,9 +86,16 @@ design_df.loc[design_df.index[design_df.uniform == 1], 'nspots'] = unif_nspots
 design_df.loc[design_df.index[design_df.uniform == 0], 'nspots'] = sparse_nspots
 
 ### Generate avg density per spot per cell type
+sigma_low = np.sqrt(mean_low / 2)
+sigma_high = np.sqrt(mean_high / 2)
 
-low_ncells_mean = np.random.gamma(mean_low, 1, size=sum(design_df.density == 1))
-high_ncells_mean = np.random.gamma(mean_high, 1, size=sum(design_df.density == 0))
+shape_low = mean_low ^ 2 / sigma_low ^ 2
+scale_low = sigma_low ^ 2 / mean_low
+shape_high = mean_high ^ 2 / sigma_high ^ 2
+scale_high = sigma_high ^ 2 / mean_high
+
+low_ncells_mean = np.random.gamma(shape=shape_low, scale=scale_low, size=sum(design_df.density == 1))
+high_ncells_mean = np.random.gamma(shape=shape_high, scale=scale_high, size=sum(design_df.density == 0))
 
 design_df['mean_ncells'] = np.nan
 design_df.loc[design_df.index[design_df.density == 1], 'mean_ncells'] = low_ncells_mean
