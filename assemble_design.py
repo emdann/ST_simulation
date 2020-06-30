@@ -14,12 +14,18 @@ parser.add_argument('seed', type=int,
 parser.add_argument('--tot_spots', dest='tot_spots', type=int,
                     default=1000,
                     help='Total number of spots to simulate')
-parser.add_argument('--mean_high', dest='mean_high', type=int,
-                    default=3,
+parser.add_argument('--mean_high', dest='mean_high', type=float,
+                    default=3.0,
                     help='Mean cell density for high-density cell types')
-parser.add_argument('--mean_low', dest='mean_low', type=int,
-                    default=1,
+parser.add_argument('--mean_low', dest='mean_low', type=float,
+                    default=1.0,
                     help='Mean cell density for low-density cell types')
+parser.add_argument('--percent_uniform', dest='percent_uniform', type=float,
+                    default=80,
+                    help='Sparsity of uniform cell types (% non-zero spots of total spots)')
+parser.add_argument('--percent_sparse', dest='percent_sparse', type=float,
+                    default=15,
+                    help='Sparsity of sparse cell types (% non-zero spots of total spots)')
 parser.add_argument('--annotation_col', dest='anno_col', type=str,
                     default="annotation_1",
                     help='Name of column to use in annotation file (default: annotation_1)')
@@ -38,6 +44,8 @@ seed = args.seed
 tot_spots = args.tot_spots
 mean_high = args.mean_high
 mean_low = args.mean_low
+percent_uniform = args.percent_uniform
+percent_sparse = args.percent_sparse
 out_dir = args.out_dir
 assemble_id = args.assemble_id
 anno_col = args.anno_col
@@ -53,7 +61,7 @@ uni_labels = lbl_generation[anno_col].unique()
 labels = lbl_generation
 cnt = cnt_generation
 
-### Define uniform VS regional cell types (w more regional)
+### Define uniform VS sparse cell types (w more sparse)
 uniform_ct = np.random.choice([0, 1], size=len(uni_labels), p=[0.8, 0.2])
 
 #### Define low VS high density cell types (w more low density)
@@ -68,10 +76,10 @@ design_df.loc[design_df.index[design_df.uniform == 0], 'density'] = reg_low
 
 ### Generate no of spots per cell type 
 # Uniform ~ 60% of spots, sparse ~ 5% of spots
-mean_unif = round((tot_spots / 100) * 90)
-mean_sparse = round((tot_spots / 100) * 20)
-sigma_unif = np.sqrt(mean_unif / 2)
-sigma_sparse = np.sqrt(mean_sparse / 2)
+mean_unif = round((tot_spots / 100) * percent_uniform)
+mean_sparse = round((tot_spots / 100) * percent_sparse)
+sigma_unif = np.sqrt(mean_unif / 0.5)
+sigma_sparse = np.sqrt(mean_sparse / 0.5)
 
 shape_unif = mean_unif ** 2 / sigma_unif ** 2
 scale_unif = sigma_unif ** 2 / mean_unif
