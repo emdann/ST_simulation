@@ -15,10 +15,10 @@ parser.add_argument('--tot_spots', dest='tot_spots', type=int,
                     default=1000,
                     help='Total number of spots to simulate')
 parser.add_argument('--mean_high', dest='mean_high', type=int,
-                    default=15,
+                    default=3,
                     help='Mean cell density for high-density cell types')
 parser.add_argument('--mean_low', dest='mean_low', type=int,
-                    default=5,
+                    default=1,
                     help='Mean cell density for low-density cell types')
 parser.add_argument('--annotation_col', dest='anno_col', type=str,
                     default="annotation_1",
@@ -68,10 +68,10 @@ design_df.loc[design_df.index[design_df.uniform == 0], 'density'] = reg_low
 
 ### Generate no of spots per cell type 
 # Uniform ~ 60% of spots, sparse ~ 5% of spots
-mean_unif = round((tot_spots / 100) * 60)
-mean_sparse = round((tot_spots / 100) * 5)
-sigma_unif = np.sqrt(mean_unif)
-sigma_sparse = np.sqrt(mean_sparse)
+mean_unif = round((tot_spots / 100) * 90)
+mean_sparse = round((tot_spots / 100) * 20)
+sigma_unif = np.sqrt(mean_unif / 2)
+sigma_sparse = np.sqrt(mean_sparse / 2)
 
 shape_unif = mean_unif ** 2 / sigma_unif ** 2
 scale_unif = sigma_unif ** 2 / mean_unif
@@ -80,6 +80,12 @@ scale_sparse = sigma_sparse ** 2 / mean_sparse
 
 unif_nspots = np.round(np.random.gamma(shape=shape_unif, scale=scale_unif, size=sum(design_df.uniform == 1)))
 sparse_nspots = np.round(np.random.gamma(shape=shape_sparse, scale=scale_sparse, size=sum(design_df.uniform == 0)))
+# if samples n spots is greater than total number of spots trim to the total
+if (unif_nspots > tot_spots).sum() >= 1:
+    unif_nspots[unif_nspots > tot_spots] = tot_spots
+if (sparse_nspots > tot_spots).sum() >= 1:
+    sparse_nspots[sparse_nspots > tot_spots] = tot_spots
+
 
 design_df['nspots'] = np.nan
 design_df.loc[design_df.index[design_df.uniform == 1], 'nspots'] = unif_nspots
