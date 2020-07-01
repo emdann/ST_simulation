@@ -15,16 +15,16 @@ parser.add_argument('--tot_spots', dest='tot_spots', type=int,
                     default=1000,
                     help='Total number of spots to simulate')
 parser.add_argument('--mean_high', dest='mean_high', type=float,
-                    default=3.0,
+                    default=2.5,
                     help='Mean cell density for high-density cell types')
 parser.add_argument('--mean_low', dest='mean_low', type=float,
-                    default=1.0,
+                    default=0.8,
                     help='Mean cell density for low-density cell types')
 parser.add_argument('--percent_uniform', dest='percent_uniform', type=float,
                     default=80,
                     help='Sparsity of uniform cell types (% non-zero spots of total spots)')
 parser.add_argument('--percent_sparse', dest='percent_sparse', type=float,
-                    default=15,
+                    default=10,
                     help='Sparsity of sparse cell types (% non-zero spots of total spots)')
 parser.add_argument('--annotation_col', dest='anno_col', type=str,
                     default="annotation_1",
@@ -61,12 +61,12 @@ uni_labels = lbl_generation[anno_col].unique()
 labels = lbl_generation
 cnt = cnt_generation
 
-### Define uniform VS sparse cell types (w more sparse)
+### Define uniform VS sparse cell types (w more sparse = 0)
 uniform_ct = np.random.choice([0, 1], size=len(uni_labels), p=[0.8, 0.2])
 
-#### Define low VS high density cell types (w more low density)
-uni_low = np.random.choice([0, 1], size=len(uni_labels[uniform_ct == 1]),  p=[0.3, 0.7])
-reg_low = np.random.choice([0, 1], size=len(uni_labels[uniform_ct == 0]),  p=[0.3, 0.7])
+#### Define low VS high density cell types (w more low density = 1)
+uni_low = np.random.choice([0, 1], size=len(uni_labels[uniform_ct == 1]),  p=[0.2, 0.8])
+reg_low = np.random.choice([0, 1], size=len(uni_labels[uniform_ct == 0]),  p=[0.2, 0.8])
 
 design_df = pd.DataFrame({'uniform': uniform_ct}, index=uni_labels)
 
@@ -78,8 +78,8 @@ design_df.loc[design_df.index[design_df.uniform == 0], 'density'] = reg_low
 # Uniform ~ 60% of spots, sparse ~ 5% of spots
 mean_unif = round((tot_spots / 100) * percent_uniform)
 mean_sparse = round((tot_spots / 100) * percent_sparse)
-sigma_unif = np.sqrt(mean_unif / 0.05)
-sigma_sparse = np.sqrt(mean_sparse / 0.05)
+sigma_unif = np.sqrt(mean_unif / 0.1)
+sigma_sparse = np.sqrt(mean_sparse / 0.1)
 
 shape_unif = mean_unif ** 2 / sigma_unif ** 2
 scale_unif = sigma_unif ** 2 / mean_unif
