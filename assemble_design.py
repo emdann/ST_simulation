@@ -78,8 +78,8 @@ design_df.loc[design_df.index[design_df.uniform == 0], 'density'] = reg_low
 # Uniform ~ 60% of spots, sparse ~ 5% of spots
 mean_unif = round((tot_spots / 100) * percent_uniform)
 mean_sparse = round((tot_spots / 100) * percent_sparse)
-sigma_unif = np.sqrt(mean_unif / 0.5)
-sigma_sparse = np.sqrt(mean_sparse / 0.5)
+sigma_unif = np.sqrt(mean_unif / 0.05)
+sigma_sparse = np.sqrt(mean_sparse / 0.05)
 
 shape_unif = mean_unif ** 2 / sigma_unif ** 2
 scale_unif = sigma_unif ** 2 / mean_unif
