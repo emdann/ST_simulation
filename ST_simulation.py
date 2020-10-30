@@ -3,23 +3,22 @@ import random
 import numpy as np
 import pandas as pd
 import torch as t
-import torch.distributions as dists
 
 
 ## --- Version 2: cell densities --- ##
 
 def assemble_ct_composition(design_df, tot_spots, ncells_scale=5):
-    '''
+    """
     Parameters
     ----------
-    design_df: pd.DataFrame containing number of spots (nspots) and mean n of 
+    design_df: pd.DataFrame containing number of spots (nspots) and mean n of
         cells per spot (mean_ncell) per cell type
     tot_spots: int
         total number of spots to simulate
     Return
     ------
-    pd.DataFrame of cell types x spots with no of cells 
-    '''
+    pd.DataFrame of cell types x spots with no of cells
+    """
     spots_members = pd.DataFrame(columns=range(tot_spots),
                                  index=design_df.index)
     ## Cell types to spot
@@ -30,25 +29,28 @@ def assemble_ct_composition(design_df, tot_spots, ncells_scale=5):
 
     ## No of cells per spot
     ncells = [
-        np.round(np.random.gamma(design_df.loc[ct,].mean_ncells, ncells_scale, size=int(design_df.loc[ct,].nspots))) for
-        ct in design_df.index]
+        #np.round(np.random.gamma(design_df.loc[ct, ].mean_ncells, ncells_scale,
+        #                         size=int(design_df.loc[ct, ].nspots)))
+        np.random.poisson(design_df.loc[ct, ].mean_ncells,
+                          size=int(design_df.loc[ct, ].nspots))
+        for ct in design_df.index]
     for i in range(spots_members.shape[0]):
         spots_members.iloc[i, spots_members.columns[spots_members.iloc[i] == 1]] = ncells[i]
-    return (spots_members)
+    return spots_members
 
 
 def assemble_spot_2(cnt, labels, members):
-    '''
+    """
     Parameters
     ----------
-    design_df: pd.DataFrame containing number of spots (nspots) and mean n of 
+    design_df: pd.DataFrame containing number of spots (nspots) and mean n of
         cells per spot (mean_ncell) per cell type
     tot_spots: int
         total number of spots to simulate
     Return
     ------
-    pd.DataFrame of cell types x spots with no of cells 
-    '''
+    pd.DataFrame of cell types x spots with no of cells
+    """
     uni_labels = members.index
     spot_expr = t.zeros(cnt.shape[1]).type(t.float32)
     nUMIs = t.zeros((len(uni_labels))).type(t.float32)
@@ -63,6 +65,7 @@ def assemble_spot_2(cnt, labels, members):
             spot_expr += z_expr
             nUMIs[z] = z_expr.sum()
     return (spot_expr, nUMIs)
+
 
 def assemble_st_2(cnt, labels, spots_members):
     tot_spots = spots_members.shape[1]
@@ -86,14 +89,13 @@ def assemble_st_2(cnt, labels, spots_members):
                            )
     return (st_cnt, st_umis)
 
-
 # ## --- Version 1: proportions --- ##
 
 # def pick_cell_types(uni_labels, alpha, min_n_cells):
 #     '''
 #     Pick cell types to include in synthetic spots with proportions from 
 #     Dirichlet distribution.
-    
+
 #     Parameters
 #     ----------
 #     uni_labels: np.array
@@ -101,11 +103,11 @@ def assemble_st_2(cnt, labels, spots_members):
 #     alpha: np.array 
 #         dirichlet distribution concentration value 
 #         (can be from cell type proportions in ST)
-        
+
 #     Return
 #     ------
 #     tuple of picked cell types and proportions
-    
+
 #     '''
 #     # get number of different
 #     # cell types present
@@ -130,7 +132,7 @@ def assemble_st_2(cnt, labels, spots_members):
 # def assemble_spot(cnt, labels, n_cells, fraction, pick_types, member_props):
 #     '''
 #     Generate one synthetic ST spot
-    
+
 #     Parameters:
 #     -----------
 #     cnt: pd.DataFrame of single-cell count data --> [n_cells x n_genes] <--
@@ -141,7 +143,7 @@ def assemble_st_2(cnt, labels, spots_members):
 #         observed in ST-spot (gene budgets in model)
 #     pick_types: torch.Tensor of cell types to include in spot (output of pick_cell_types)
 #     member_props: torch.Tensor of the proportions of different cell types in spots (output of pick_cell_types)
-    
+
 #     Returns:
 #     --------
 #     Dictionary with expression data,
@@ -270,7 +272,7 @@ def assemble_st_2(cnt, labels, spots_members):
 #     fraction: float or np.array 
 #         fraction of transcripts from each cell being 
 #         observed in ST-spot (gene budgets in model)
-    
+
 #     (if you don't want zonation you can just make as many regions as spots)
 #     '''
 #     # count total number of spots
