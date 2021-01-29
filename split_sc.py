@@ -65,7 +65,7 @@ labels = sc_lbl.iloc[:, 0].values
 uni_labs, uni_counts = np.unique(labels, return_counts=True)
 
 # only keep types with more than 50 cells
-keep_types = uni_counts > 50
+keep_types = uni_counts > 40
 keep_cells = np.isin(labels, uni_labs[keep_types])
 
 labels = labels[keep_cells]
